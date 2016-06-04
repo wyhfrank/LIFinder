@@ -1,0 +1,38 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Getopt::Std;
+use LIFinder;
+
+my %opts = parse_cmdline_parameters();
+my @input_dirs = @ARGV;
+my $output_dir = '.';
+my $file_types = 'c,cpp,java';
+$output_dir = $opts{o} if exists $opts{o};
+$file_types = $opts{t} if exists $opts{t};
+
+my $license_result = LIFinder::process(\@input_dirs, $output_dir, $file_types);
+print "done.\n";
+exit 0;
+
+sub parse_cmdline_parameters {
+    my %opts = ();
+    if (!getopts('o:t:', \%opts) || scalar(@ARGV) == 0) {
+        print STDERR <<"END";
+LIFinder v${LIFinder::VERSION}
+
+Usage: $0 [options] <dir1> <dir2> ...
+
+Options:
+  -o specify the output directory, default is current directory
+  -t specify file types, separated by comma. default: c,cpp,java
+END
+  # -f force refreshing the database
+  
+        exit 1;
+    }
+    return %opts;
+}
+
+__END__
