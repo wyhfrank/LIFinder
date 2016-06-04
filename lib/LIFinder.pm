@@ -57,7 +57,8 @@ sub process {
 	# step 2: tokenize the files and save the hash value
 	#	of the normalized tokens
 	my %parameter_step2 = (%common_parameters,
-		file_types => $file_types);
+		file_types => $file_types,
+		output_dir => $output_dir);
 	LIFinder::TokenHash->new(%parameter_step2)->execute();
 
 	$db->closedb();
