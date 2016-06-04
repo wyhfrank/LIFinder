@@ -47,8 +47,8 @@ sub createdb {
            PRIMARY KEY(id)););
     $dbh->do($stmt);
     $stmt = qq(CREATE TABLE IF NOT EXISTS token_info
-           (id INT, hash TEXT, length INT, count INT,
-           PRIMARY KEY(id)););
+           (id INTEGER PRIMARY KEY AUTOINCREMENT, hash TEXT UNIQUE, 
+           length INT, occurance INT););
     $dbh->do($stmt);
     $stmt = qq(CREATE TABLE IF NOT EXISTS dirs
            (id INT, path TEXT,

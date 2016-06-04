@@ -9,3 +9,4 @@ _build/
 *.tmp
 *.sublime-project
 *.sublime-workspace
+*.bak
