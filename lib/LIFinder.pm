@@ -5,6 +5,7 @@ use warnings;
 use LIFinder::DB;
 use LIFinder::FileLister;
 use LIFinder::TokenHash;
+use File::Spec::Functions 'catfile';
 
 =head1 NAME
 
@@ -63,8 +64,13 @@ sub process {
 }
 
 sub _init_output_dir {
-	my $output_dir = shift;
+	my $output_root = shift;
 
+	die "Directory does not exist: $output_root\n"
+		if !-d $output_root;
+
+	my $output_dir = catfile($output_root, 'output');
+	mkdir $output_dir;
 	return $output_dir;
 }
 
