@@ -50,6 +50,7 @@ sub _make_list {
     my @file_list = @{ $file_list_ref };
 
     # TODO: ccfx bug: it can only read the list file under current dir
+    #   Maybe because I'm using its Windows version via Cygwin.
     my $tmp_file = $ext . '_list';
     # my $tmp_file = catfile($self->{output_dir}, $ext . '_list');
 
@@ -96,8 +97,8 @@ sub _read_tokens {
 sub _normalize_token {
     my $tokens = shift;
 
-    $tokens =~ s/^[^+]+[^ \t]+[ \t]+//mg;
-    $tokens =~ s/\|.*$//mg;
+    $tokens =~ s/^[^+]+[^ \t]+[ \t]+//mg; # 1. Remove leading line number etc.
+    $tokens =~ s/\|.*$//mg; # 2. Remove identifier names
     # print "$tokens\n";
 
     return \$tokens;

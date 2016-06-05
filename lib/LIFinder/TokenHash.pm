@@ -46,6 +46,11 @@ sub execute {
 
     my $token_info_id = 0;
     foreach my $ext (@exts) {
+        # @file_list looks like this:
+        # @file_list = (
+        #     { id => '1', path => 'path', hash = > 'deadbeef', },
+        #     { ... },
+        #     );
         my @file_list;
 
         $sel_sth->execute($ext) or die $DBI::errstr;
