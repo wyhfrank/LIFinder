@@ -38,7 +38,7 @@ sub createdb {
 
     my $stmt;
     $stmt = qq(CREATE TABLE IF NOT EXISTS files
-           (id INIT, path TEXT, ext TEXT, token_info_id INT, group_id INT, 
+           (id INT, path TEXT, ext TEXT, token_info_id INT, group_id INT, 
            license TEXT, dir_id INT,
            PRIMARY KEY(id)););
     $dbh->do($stmt);
@@ -47,7 +47,7 @@ sub createdb {
            PRIMARY KEY(id)););
     $dbh->do($stmt);
     $stmt = qq(CREATE TABLE IF NOT EXISTS token_info
-           (id INTEGER PRIMARY KEY AUTOINCREMENT, hash TEXT UNIQUE, 
+           (id INT PRIMARY KEY AUTOINCREMENT, hash TEXT UNIQUE, 
            length INT, occurance INT););
     $dbh->do($stmt);
     $stmt = qq(CREATE TABLE IF NOT EXISTS dirs
