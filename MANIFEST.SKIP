@@ -82,3 +82,4 @@
 
 \.sublime-project$
 \.sublime-workspace$
+^xt/
