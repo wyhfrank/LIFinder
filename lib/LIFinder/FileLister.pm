@@ -27,23 +27,21 @@ sub execute {
     my @dirs = @{ $self->{input_dirs_ref} };
     my $dbm = $self->{dbm};
 
-    my $file_id = 0;
-    for (my $i = 0; $i < scalar(@dirs); $i++) {
+    # TODO: bug. second directory is not scaned.
+    foreach my $dir (@dirs) {
 
         # insert dir data into database
-        $dbm->execute('i_dir', $i, $dirs[$i]);
+        $dbm->execute('i_dir', $dir);
 
-        my @files = @{ _get_files_under($dirs[$i], \@types) };
+        my @files = @{ _get_files_under($dir, \@types) };
         for my $f (@files) {
             # $f =~ /\.[^.]+$/; # split path and extension
             # my $base = $`;
             # my $ext = $&;
-            my ($filename, $dirs, $suffix) = fileparse($f, qr/\.[^.]*$/);
+            my ($filename, $dir_middle, $suffix) = fileparse($f, qr/\.[^.]*$/);
 
             # insert file data into database
-            $dbm->execute('i_file', $file_id, $dirs . $filename, $suffix, $i);
-
-            $file_id++;
+            $dbm->execute('i_file', $dir_middle . $filename, $suffix, $dir);
         }
     }
 

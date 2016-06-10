@@ -6,34 +6,48 @@ use File::Spec::Functions 'catfile';
 
 
 my @creat_list = (
-	qq(CREATE TABLE IF NOT EXISTS files
-		(id INT, path TEXT, ext TEXT, token_info_id INT, group_id INT, 
+    # IF, file: /dir/to/file/name.cpp
+    # AND dir is: /dir
+    # THEN file path: /to/file/name
+    # dir path: /dir
+    # ext: .cpp
+	q{CREATE TABLE IF NOT EXISTS files
+		(path TEXT, ext TEXT, token_info_id INT, group_id INT, 
 		license TEXT, dir_id INT,
-		PRIMARY KEY(id));),
-	qq(CREATE TABLE IF NOT EXISTS groups
-		(id INT, all_same_license INT, none INT, unknow INT,
-		PRIMARY KEY(id));),
-	qq(CREATE TABLE IF NOT EXISTS token_info
-		(id INT PRIMARY KEY, hash TEXT UNIQUE, 
-		length INT, occurance INT);),
-	qq(CREATE TABLE IF NOT EXISTS dirs
-		(id INT, path TEXT,
-		PRIMARY KEY(id));),
+        FOREIGN KEY(token_info_id) REFERENCES token_info(oid),
+        FOREIGN KEY(group_id) REFERENCES groups(oid),
+        FOREIGN KEY(dir_id) REFERENCES dirs(oid),
+		PRIMARY KEY(path, ext));},
+	q{CREATE TABLE IF NOT EXISTS groups
+		(all_same_license INT, none INT, unknow INT
+		);},
+	q{CREATE TABLE IF NOT EXISTS token_info
+		(hash TEXT PRIMARY KEY, 
+		length INT, occurance INT);},
+	q{CREATE TABLE IF NOT EXISTS dirs
+		(path TEXT PRIMARY KEY
+		);},
 	);
 
 my %sth_table = (
-    i_file => q(INSERT INTO files (id, path, ext, dir_id) 
-                    VALUES (?, ?, ?, ?);),
-    i_dir => q(INSERT INTO dirs (id, path) VALUES (?, ?);),
+    # dir_path
+    i_dir => q{INSERT OR IGNORE INTO dirs (path) VALUES (?);},
+    # file_path, ext, dir_path
+    i_file => q{INSERT OR IGNORE INTO files (path, ext, dir_id) 
+            VALUES (?, ?, (SELECT oid FROM dirs WHERE path = ?));},
 
-    s_file => q(SELECT files.id, dirs.path, files.path FROM
-        files, dirs WHERE files.dir_id = dirs.id AND files.ext = ?;),
-    i_token => q(INSERT OR IGNORE INTO token_info 
-        (hash, length, occurance) VALUES (?, ?, 0);),
-    u_token => q(UPDATE token_info SET occurance = occurance+1 
-        WHERE hash = ?;),
-    u_file => q(UPDATE files SET token_info_id = 
-        (SELECT id FROM token_info WHERE hash=?) WHERE id = ?;),
+    # file_ext => (file_id, dir_path, file_path)
+    s_file => q{SELECT files.oid, dirs.path, files.path FROM
+        files INNER JOIN dirs ON files.dir_id = dirs.oid WHERE files.ext = ?;},
+    # hash, length
+    i_token => q{INSERT OR IGNORE INTO token_info 
+        (hash, length, occurance) VALUES (?, ?, 0);},
+    # hash
+    u_token => q{UPDATE token_info SET occurance = occurance+1 
+        WHERE hash = ?;},
+    # hash, file_id
+    u_file => q{UPDATE files SET token_info_id = 
+        (SELECT oid FROM token_info WHERE hash = ?) WHERE oid = ?;},
     );
 
 sub new {
