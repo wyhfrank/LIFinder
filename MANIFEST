@@ -2,10 +2,14 @@ bin/lifinder
 Build.PL
 Changes
 lib/LIFinder.pm
-lib/LIFinder/DB.pm
+lib/LIFinder/DBManager.pm
 lib/LIFinder/FileLister.pm
 lib/LIFinder/TokenHash.pm
 lib/LIFinder/Tokenizor/CCFinderX.pm
 MANIFEST			This list of files
 README
 t/00-load.t
+t/data/1021_pt_chown.c
+t/data/1982_tst-strtod-underflow.c
+t/data/30_argp-test.c
+t/data/623_hurdinit.c

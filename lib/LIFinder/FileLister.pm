@@ -10,12 +10,12 @@ sub new {
     my $self = bless({}, $class);
 
     die "parameter 'input_dirs_ref' is mandatory" unless exists $args{input_dirs_ref};
-    die "parameter 'db' is mandatory" unless exists $args{db};
+    die "parameter 'dbm' is mandatory" unless exists $args{dbm};
     die "parameter 'file_types' is mandatory" unless exists $args{file_types};
 
     $self->{input_dirs_ref} = $args{input_dirs_ref};
     $self->{file_types} = $args{file_types};
-    $self->{db} = $args{db};
+    $self->{dbm} = $args{dbm};
 
     return $self;
 }
@@ -25,19 +25,13 @@ sub execute {
 
     my @types = split /,/, $self->{file_types};
     my @dirs = @{ $self->{input_dirs_ref} };
-    my $db = $self->{db};
-
-    my $insert_file = q(INSERT INTO files (id, path, ext, dir_id) 
-                        VALUES (?, ?, ?, ?););
-    my $insert_dir = q(INSERT INTO dirs (id, path) VALUES (?, ?););
-    my $sth_file = $db->prepare($insert_file);
-    my $sth_dir = $db->prepare($insert_dir);
+    my $dbm = $self->{dbm};
 
     my $file_id = 0;
     for (my $i = 0; $i < scalar(@dirs); $i++) {
 
         # insert dir data into database
-        $sth_dir->execute($i, $dirs[$i]) or die $DBI::errstr;
+        $dbm->execute('i_dir', $i, $dirs[$i]);
 
         my @files = @{ _get_files_under($dirs[$i], \@types) };
         for my $f (@files) {
@@ -47,16 +41,13 @@ sub execute {
             my ($filename, $dirs, $suffix) = fileparse($f, qr/\.[^.]*$/);
 
             # insert file data into database
-            $sth_file->execute($file_id, $dirs . $filename, $suffix, $i) 
-                or die $DBI::errstr;
+            $dbm->execute('i_file', $file_id, $dirs . $filename, $suffix, $i);
 
             $file_id++;
         }
     }
 
-    $sth_file->finish();
-    $sth_dir->finish();
-    $db->commit();
+    $dbm->commit();
 }
 
 sub _get_files_under {

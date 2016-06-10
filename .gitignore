@@ -10,3 +10,4 @@ _build/
 *.sublime-project
 *.sublime-workspace
 *.bak
+t/temp/

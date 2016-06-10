@@ -2,7 +2,7 @@ package LIFinder;
 
 use strict;
 use warnings;
-use LIFinder::DB;
+use LIFinder::DBManager;
 use LIFinder::FileLister;
 use LIFinder::TokenHash;
 use File::Spec::Functions 'catfile';
@@ -43,10 +43,11 @@ sub process {
 	$output_dir = _init_output_dir($output_dir);
 	my %parameter_step0 = (%common_parameters, 
 		output_dir => $output_dir);
-	my $db = LIFinder::DB->new(%parameter_step0);
 
-	$db->createdb();
-	$common_parameters{db} = $db;
+	my $dbm = LIFinder::DBManager->new(%parameter_step0);
+
+	$dbm->createdb()->prepare_all();
+	$common_parameters{dbm} = $dbm;
 
 	# step 1: list files in specified directories
 	my %parameter_step1 = (%common_parameters, 
@@ -61,7 +62,7 @@ sub process {
 		output_dir => $output_dir);
 	LIFinder::TokenHash->new(%parameter_step2)->execute();
 
-	$db->closedb();
+	$dbm->closedb();
 }
 
 sub _init_output_dir {
@@ -74,6 +75,7 @@ sub _init_output_dir {
 	mkdir $output_dir;
 	return $output_dir;
 }
+
 
 
 =head1 AUTHOR
