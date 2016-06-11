@@ -17,7 +17,7 @@ my @creat_list = (
         FOREIGN KEY(token_info_id) REFERENCES token_info(oid),
         FOREIGN KEY(group_id) REFERENCES groups(oid),
         FOREIGN KEY(dir_id) REFERENCES dirs(oid),
-		PRIMARY KEY(path, ext));},
+		PRIMARY KEY(path, ext, dir_id));},
 	q{CREATE TABLE IF NOT EXISTS groups
 		(all_same_license INT, none INT, unknow INT
 		);},

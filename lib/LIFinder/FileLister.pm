@@ -1,5 +1,6 @@
 package LIFinder::FileLister;
 
+use 5.010;
 use strict;
 use File::Find;
 use File::Basename;
@@ -27,13 +28,14 @@ sub execute {
     my @dirs = @{ $self->{input_dirs_ref} };
     my $dbm = $self->{dbm};
 
-    # TODO: bug. second directory is not scaned.
     foreach my $dir (@dirs) {
 
         # insert dir data into database
         $dbm->execute('i_dir', $dir);
 
         my @files = @{ _get_files_under($dir, \@types) };
+        # say "Files under [$dir]:\n" . join "\n", @files;
+
         for my $f (@files) {
             # $f =~ /\.[^.]+$/; # split path and extension
             # my $base = $`;
