@@ -14,6 +14,7 @@ sub new {
 
     $self->{dbm} = $args{dbm};
     $self->{output_dir} = $args{output_dir};
+    $self->{inter_dir} = $args{inter_dir};
     $self->{num_of_lic_threshold} = exists $args{num_of_lic_threshold} ?
         $args{num_of_lic_threshold} : 1;
 
@@ -27,13 +28,18 @@ sub execute {
 
     my $fh = $self->create_report_file();
 
-    my $lic_sep = ';'; # Seporator between licenses
-    my $group_sth = $dbm->execute('s_group', $lic_sep, $self->{num_of_lic_threshold});
+    my $sep = ';'; # Seporator used to concat licenses
+    my $group_sth = $dbm->execute('s_group', $sep, $self->{num_of_lic_threshold});
 
     my @header = qw(GroupID #Licenses #None #Unkown Licenses);
     say $fh join_line(@header);
 
     while (my @group_row = $group_sth->fetchrow_array) {
+
+        # skip groups that contain files under one directory, in inter_dir mode
+        my $dir_count = pop @group_row;
+        next if $self->{inter_dir} and $dir_count <= 1;
+
         my $line = join_line(@group_row);
         say $fh $line;
     }
@@ -51,6 +57,7 @@ sub create_report_file {
     my $group_report = catfile($self->{output_dir}, 'groups.csv');
     open FILE, '>', $group_report;
     $self->{grp_report_fh} = *FILE{IO};
+    # $self->{grp_report_fh} = *STDOUT{IO}; # debug
     return $self->{grp_report_fh};
 }
 

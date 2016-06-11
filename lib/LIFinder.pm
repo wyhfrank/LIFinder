@@ -36,7 +36,7 @@ Perhaps a little code snippet.
 =cut
 
 sub process {
-	my ($input_dirs_ref, $output_dir, $file_types) = @_;
+	my ($input_dirs_ref, $output_dir, $file_types, $inter_dir) = @_;
 	my @input_dirs = @{ $input_dirs_ref };
 
 	my $occurance_threshold = 2;
@@ -73,7 +73,9 @@ sub process {
 
 	# step 4: make report about license inconsistency
 	my %parameter_step4 = (%common_parameters,
-		output_dir => $output_dir);
+		output_dir => $output_dir,
+		inter_dir => $inter_dir,
+		);
 	LIFinder::ReportMaker->new(%parameter_step4)->execute();
 
 	$dbm->closedb();
