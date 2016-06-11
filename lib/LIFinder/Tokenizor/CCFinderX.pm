@@ -51,7 +51,7 @@ sub _make_list {
 
     # TODO: ccfx bug: it can only read the list file under current dir
     #   Maybe because I'm using its Windows version via Cygwin.
-    my $tmp_file = $ext . '_list';
+    my $tmp_file = $ext . '_list.tmp';
     # my $tmp_file = catfile($self->{output_dir}, $ext . '_list');
 
     open FILE, '>', $tmp_file or die "Cannot write file: $tmp_file\n";

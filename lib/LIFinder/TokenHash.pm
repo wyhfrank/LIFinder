@@ -41,8 +41,11 @@ sub execute {
 
         my $sth = $dbm->execute('s_file', $ext);
 
-        while (my @row = $sth->fetchrow_array()) {
-            my ($f_id, $dir, $path) = @row;
+        my $ary_ref = $sth->fetchall_arrayref();
+        next unless scalar(@$ary_ref) > 0;
+
+        foreach my $row_ref (@$ary_ref) {
+            my ($f_id, $dir, $path) = @$row_ref;
             my $full_path = join('', $dir, $path, $ext);
 
             # print "$full_path\n";
