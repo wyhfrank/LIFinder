@@ -16,7 +16,7 @@ sub new {
     $self->{output_dir} = $args{output_dir};
     $self->{inter_dir} = $args{inter_dir};
     $self->{num_of_lic_threshold} = exists $args{num_of_lic_threshold} ?
-        $args{num_of_lic_threshold} : 1;
+        $args{num_of_lic_threshold} : 2;
     $self->{min_token_len} = exists $args{min_token_len} ?
         $args{min_token_len} : 50;
 
