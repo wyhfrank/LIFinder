@@ -1,5 +1,6 @@
 package LIFinder::DBManager;
 
+use 5.010;
 use strict;
 use DBI;
 use File::Spec::Functions 'catfile';
@@ -19,7 +20,7 @@ my @creat_list = (
         FOREIGN KEY(dir_id) REFERENCES dirs(oid),
 		PRIMARY KEY(path, ext, dir_id));},
 	q{CREATE TABLE IF NOT EXISTS groups
-		(token_info_id INT, all_same_license INT, none INT, unknow INT,
+		(token_info_id INT, num_of_lic INT, none INT, unknown INT,
         FOREIGN KEY(token_info_id) REFERENCES token_info(oid)
 		);},
 	q{CREATE TABLE IF NOT EXISTS token_info
@@ -52,11 +53,15 @@ my %sth_table = (
 
     # occurance => (token_info_id)
     s_token => q{SELECT oid FROM token_info WHERE occurance >= ?;},
-    # token_id => (file_id, dir_path, file_path, file_ext)
+    # token_info_id => (file_id, dir_path, file_path, file_ext)
     s_file_with_token_id => q{SELECT f.oid, d.path, f.path, f.ext FROM files f 
         INNER JOIN dirs d ON f.dir_id = d.oid WHERE f.token_info_id = ?;},
-    # license, file_id
-    u_file_license => q{UPDATE files SET license = ?
+    i_group => q{INSERT OR IGNORE INTO groups 
+        (token_info_id, num_of_lic, none, unknown) VALUES (?, ?, ?, ?);},
+    # license, file_id, file_id
+    u_file_license => q{UPDATE files SET license = ?, group_id = 
+        (SELECT oid FROM groups WHERE groups.token_info_id = 
+        (SELECT token_info_id FROM files WHERE oid = ?))
         WHERE oid = ?;},
     );
 
