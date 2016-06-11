@@ -1,5 +1,6 @@
 package LIFinder;
 
+use 5.010;
 use strict;
 use warnings;
 use LIFinder::DBManager;
@@ -7,7 +8,9 @@ use LIFinder::FileLister;
 use LIFinder::TokenHash;
 use LIFinder::LicenseIndentifier;
 use LIFinder::ReportMaker;
+
 use File::Spec::Functions 'catfile';
+use Time::HiRes qw(gettimeofday);
 
 =head1 NAME
 
@@ -35,12 +38,15 @@ Perhaps a little code snippet.
 
 =cut
 
+
 sub process {
 	my ($input_dirs_ref, $output_dir, $file_types, $inter_dir) = @_;
 	my @input_dirs = @{ $input_dirs_ref };
 
+	# only select tokens that occur more than
 	my $occurance_threshold = 2;
 
+	my $time_cost = 0;
 	my %common_parameters = ();
 
 	# step 0: create output dir, initialize database
@@ -57,26 +63,29 @@ sub process {
 	my %parameter_step1 = (%common_parameters, 
 		input_dirs_ref => $input_dirs_ref,
 		file_types => $file_types);
-	LIFinder::FileLister->new(%parameter_step1)->execute();
+	$time_cost += _execute_step('LIFinder::FileLister', \%parameter_step1);
 
 	# step 2: tokenize the files and save the hash value
 	#	of the normalized tokens
 	my %parameter_step2 = (%common_parameters,
 		file_types => $file_types,
 		output_dir => $output_dir);
-	LIFinder::TokenHash->new(%parameter_step2)->execute();
+	$time_cost += _execute_step('LIFinder::TokenHash', \%parameter_step2);
+
 
 	# step 3: identify license of files and calculate group metrics
 	my %parameter_step3 = (%common_parameters,
 		occurance_threshold => $occurance_threshold);
-	LIFinder::LicenseIndentifier->new(%parameter_step3)->execute();
+	$time_cost += _execute_step('LIFinder::LicenseIndentifier', \%parameter_step3);
 
 	# step 4: make report about license inconsistency
 	my %parameter_step4 = (%common_parameters,
 		output_dir => $output_dir,
 		inter_dir => $inter_dir,
 		);
-	LIFinder::ReportMaker->new(%parameter_step4)->execute();
+	$time_cost += _execute_step('LIFinder::ReportMaker', \%parameter_step4);
+
+	report_time_cost('Total', $time_cost);
 
 	$dbm->closedb();
 }
@@ -90,6 +99,33 @@ sub _init_output_dir {
 	my $output_dir = catfile($output_root, 'output');
 	mkdir $output_dir;
 	return $output_dir;
+}
+
+sub _execute_step {
+	my ($class_name, $parameter) = @_;
+
+	my $obj = $class_name->new(%$parameter);
+	die "Class $class_name has no execute()\n" 
+		unless $obj->can('execute');
+
+	my $old_time = gettimeofday;
+	
+	$obj->execute();
+	
+	my $time_elapsed = gettimeofday - $old_time;
+
+	my $desc = $obj->can('get_desc')?
+		$obj->get_desc() : $class_name;
+
+	report_time_cost($desc, $time_elapsed);
+
+	return $time_elapsed;
+}
+
+sub report_time_cost {
+	my ($desc, $time) = @_;
+
+	say sprintf "%s: %.3fs", $desc, $time;	
 }
 
 

@@ -21,6 +21,10 @@ sub new {
     return $self;
 }
 
+sub get_desc {
+    return "Report license inconsistencies";
+}
+
 sub execute {
     my ($self) = @_;
 

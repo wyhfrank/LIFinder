@@ -23,6 +23,10 @@ sub new {
     return $self;
 }
 
+sub get_desc {
+    return "Get hash of tokens";
+}
+
 sub execute {
     my ($self) = @_;
 

@@ -22,6 +22,10 @@ sub new {
     return $self;
 }
 
+sub get_desc {
+    return "Identify licenses";
+}
+
 sub execute {
     my ($self) = @_;
 

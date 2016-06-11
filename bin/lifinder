@@ -15,7 +15,7 @@ my $inter_dir = exists $opts{i};
 
 my $license_result = LIFinder::process(\@input_dirs, $output_dir, 
 	$file_types, $inter_dir);
-print "done.\n";
+# print "done.\n";
 exit 0;
 
 sub parse_cmdline_parameters {

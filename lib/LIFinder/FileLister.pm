@@ -21,6 +21,10 @@ sub new {
     return $self;
 }
 
+sub get_desc {
+    return "List files";
+}
+
 sub execute {
     my ($self) = @_;
 
