@@ -1,15 +1,21 @@
 LIFinder
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
+License Inconsistency Finder is an implementation of the method in our paper:
 
-A README file is required for CPAN modules since CPAN extracts the README
-file from a module distribution so that people browsing the archive
-can use it to get an idea of the module's uses. It is usually a good idea
-to provide version information here so that people can decide whether
-fixes for the module are worth downloading.
+Yuhao Wu, Yuki Manabe, Tetsuya Kanda, Daniel M. German and Katsuro Inoue. A Method 
+to Detect License Inconsistencies in Large-Scale Open Source Projects. In 12th Working
+Conference on Mining Software Repositories (MSR 2015).
+
+This paper is available at:
+PDF: http://sel.ist.osaka-u.ac.jp/lab-db/betuzuri/archive/992/992.pdf
+PPTX: http://sel.ist.osaka-u.ac.jp/lab-db/betuzuri/archive/992/992.pptx
+
+
+PRE-REQUESTS
+
+	CCFinderX (https://github.com/dmgerman/ccfx)
+
+	Ninka (https://github.com/dmgerman/ninka)
 
 
 INSTALLATION
@@ -21,6 +27,10 @@ To install this module, run the following commands:
 	./Build test
 	./Build install
 
+
+HOW TO USE
+
+	lifinder -t c,cpp,java <dir1> <dir2>
 
 LICENSE AND COPYRIGHT
 
