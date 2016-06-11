@@ -64,10 +64,12 @@ my %sth_table = (
         (SELECT token_info_id FROM files WHERE oid = ?))
         WHERE oid = ?;},
 
-    # lic_sep, nol_threshold => (gid, nol, none, unknown, licenses, distinct_dir_count))
+    # lic_sep, nol_threshold, lot_threshold => (gid, nol, none, unknown, 
+    #   licenses, distinct_dir_count)
     s_group => q{SELECT g.oid, num_of_lic, none, unknown, GROUP_CONCAT(license, ?),
         COUNT(DISTINCT dir_id) FROM groups g INNER JOIN files f ON g.oid=f.group_id
-        WHERE g.num_of_lic >= ? GROUP BY g.oid ORDER BY license;},
+        INNER JOIN token_info t ON t.oid=f.token_info_id
+        WHERE g.num_of_lic >= ? AND t.length > ? GROUP BY g.oid ORDER BY license;},
     );
 
 sub new {

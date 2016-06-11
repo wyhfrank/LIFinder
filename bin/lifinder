@@ -9,18 +9,20 @@ my %opts = parse_cmdline_parameters();
 my @input_dirs = @ARGV;
 my $output_dir = '.';
 my $file_types = 'c,cpp,java';
+my $min_token_len = 50;
 $output_dir = $opts{o} if exists $opts{o};
 $file_types = $opts{t} if exists $opts{t};
+$min_token_len = $opts{l} if exists $opts{l};
 my $inter_dir = exists $opts{i};
 
 my $license_result = LIFinder::process(\@input_dirs, $output_dir, 
-	$file_types, $inter_dir);
+	$file_types, $inter_dir, $min_token_len);
 # print "done.\n";
 exit 0;
 
 sub parse_cmdline_parameters {
     my %opts = ();
-    if (!getopts('o:t:i', \%opts) || scalar(@ARGV) == 0) {
+    if (!getopts('o:t:il:', \%opts) || scalar(@ARGV) == 0) {
         print STDERR <<"END";
 LIFinder v${LIFinder::VERSION}
 
@@ -28,8 +30,13 @@ Usage: $0 [options] <dir1> <dir2> ...
 
 Options:
   -o specify the output directory, default is current directory
+
   -t specify file types, separated by comma. default: c,cpp,java
+
   -i only report inter-directory license inconsistencies
+
+  -l minimal length of token to be considered as file clones, default 50
+  
 END
   # -f force refreshing the database
   

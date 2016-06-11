@@ -17,6 +17,8 @@ sub new {
     $self->{inter_dir} = $args{inter_dir};
     $self->{num_of_lic_threshold} = exists $args{num_of_lic_threshold} ?
         $args{num_of_lic_threshold} : 1;
+    $self->{min_token_len} = exists $args{min_token_len} ?
+        $args{min_token_len} : 50;
 
     return $self;
 }
@@ -33,7 +35,8 @@ sub execute {
     my $fh = $self->create_report_file();
 
     my $sep = ';'; # Seporator used to concat licenses
-    my $group_sth = $dbm->execute('s_group', $sep, $self->{num_of_lic_threshold});
+    my $group_sth = $dbm->execute('s_group', $sep, 
+        $self->{num_of_lic_threshold}, $self->{min_token_len});
 
     my @header = qw(GroupID #Licenses #None #Unkown Licenses);
     say $fh join_line(@header);

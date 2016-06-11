@@ -40,7 +40,9 @@ Perhaps a little code snippet.
 
 
 sub process {
-	my ($input_dirs_ref, $output_dir, $file_types, $inter_dir) = @_;
+	my ($input_dirs_ref, $output_dir, $file_types, 
+		$inter_dir, $min_token_len) = @_;
+
 	my @input_dirs = @{ $input_dirs_ref };
 
 	# only select tokens that occur more than
@@ -82,6 +84,7 @@ sub process {
 	my %parameter_step4 = (%common_parameters,
 		output_dir => $output_dir,
 		inter_dir => $inter_dir,
+		min_token_len => $min_token_len,
 		);
 	$time_cost += _execute_step('LIFinder::ReportMaker', \%parameter_step4);
 
