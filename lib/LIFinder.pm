@@ -6,6 +6,7 @@ use LIFinder::DBManager;
 use LIFinder::FileLister;
 use LIFinder::TokenHash;
 use LIFinder::LicenseIndentifier;
+use LIFinder::ReportMaker;
 use File::Spec::Functions 'catfile';
 
 =head1 NAME
@@ -65,11 +66,15 @@ sub process {
 		output_dir => $output_dir);
 	LIFinder::TokenHash->new(%parameter_step2)->execute();
 
-	# step 3: identify license of files
+	# step 3: identify license of files and calculate group metrics
 	my %parameter_step3 = (%common_parameters,
 		occurance_threshold => $occurance_threshold);
 	LIFinder::LicenseIndentifier->new(%parameter_step3)->execute();
 
+	# step 4: make report about license inconsistency
+	my %parameter_step4 = (%common_parameters,
+		output_dir => $output_dir);
+	LIFinder::ReportMaker->new(%parameter_step4)->execute();
 
 	$dbm->closedb();
 }

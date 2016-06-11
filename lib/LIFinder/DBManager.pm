@@ -58,11 +58,17 @@ my %sth_table = (
         INNER JOIN dirs d ON f.dir_id = d.oid WHERE f.token_info_id = ?;},
     i_group => q{INSERT OR IGNORE INTO groups 
         (token_info_id, num_of_lic, none, unknown) VALUES (?, ?, ?, ?);},
-    # license, file_id, file_id
+    # license, file_id, file_id [CAUTION: file_id need to be passed twice]
     u_file_license => q{UPDATE files SET license = ?, group_id = 
         (SELECT oid FROM groups WHERE groups.token_info_id = 
         (SELECT token_info_id FROM files WHERE oid = ?))
         WHERE oid = ?;},
+
+    # separator, nol_threshold => (gid, nol, none, unknown, licenses))
+    s_group => q{SELECT g.oid, num_of_lic, none, unknown, GROUP_CONCAT(license, ?) 
+        FROM groups g INNER JOIN files f ON g.oid=f.group_id
+        WHERE g.num_of_lic >= ? ORDER BY license;},
+
     );
 
 sub new {

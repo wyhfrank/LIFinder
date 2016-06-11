@@ -5,6 +5,7 @@ lib/LIFinder.pm
 lib/LIFinder/DBManager.pm
 lib/LIFinder/FileLister.pm
 lib/LIFinder/LicenseIndentifier.pm
+lib/LIFinder/ReportMaker.pm
 lib/LIFinder/TokenHash.pm
 lib/LIFinder/Tokenizor/CCFinderX.pm
 MANIFEST			This list of files
