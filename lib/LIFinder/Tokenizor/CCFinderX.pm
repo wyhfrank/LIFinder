@@ -40,6 +40,8 @@ sub _run_ccfx {
     my $ccfx_cmd = $ccfx_default_cmd;
     $ccfx_cmd = $ENV{CCFX} if (exists $ENV{CCFX});
 
+    die "Cannot find $ccfx_cmd\n." unless `which $ccfx_cmd 2>/dev/null`;
+
     my $ccfx_type = _determine_type($ext);
     # print "$ccfx_cmd d $ccfx_type -p -i $tmp_list\n";
     system($ccfx_cmd, 'd', $ccfx_type, '-p', '-i', $tmp_list);

@@ -16,8 +16,12 @@ sub new {
     $self->{occurance_threshold} = exists $args{occurance_threshold} ?
         $args{occurance_threshold} : 2;
 
-    $self->{ninka_cmd} = $ENV{NINKA} ?
+    my $ninka_cmd = $ENV{NINKA} ?
         $ENV{NINKA} : $ninka_default_cmd;
+    
+    die "Cannot find $ninka_cmd\n" unless `which $ninka_cmd 2>/dev/null`;
+    
+    $self->{ninka_cmd} = $ninka_cmd;
 
     return $self;
 }
