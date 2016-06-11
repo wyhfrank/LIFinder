@@ -19,7 +19,8 @@ my @creat_list = (
         FOREIGN KEY(dir_id) REFERENCES dirs(oid),
 		PRIMARY KEY(path, ext, dir_id));},
 	q{CREATE TABLE IF NOT EXISTS groups
-		(all_same_license INT, none INT, unknow INT
+		(token_info_id INT, all_same_license INT, none INT, unknow INT,
+        FOREIGN KEY(token_info_id) REFERENCES token_info(oid)
 		);},
 	q{CREATE TABLE IF NOT EXISTS token_info
 		(hash TEXT PRIMARY KEY, 
@@ -48,6 +49,15 @@ my %sth_table = (
     # hash, file_id
     u_file => q{UPDATE files SET token_info_id = 
         (SELECT oid FROM token_info WHERE hash = ?) WHERE oid = ?;},
+
+    # occurance => (token_info_id)
+    s_token => q{SELECT oid FROM token_info WHERE occurance >= ?;},
+    # token_id => (file_id, dir_path, file_path, file_ext)
+    s_file_with_token_id => q{SELECT f.oid, d.path, f.path, f.ext FROM files f 
+        INNER JOIN dirs d ON f.dir_id = d.oid WHERE f.token_info_id = ?;},
+    # license, file_id
+    u_file_license => q{UPDATE files SET license = ?
+        WHERE oid = ?;},
     );
 
 sub new {

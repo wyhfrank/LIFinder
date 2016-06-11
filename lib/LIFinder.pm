@@ -5,6 +5,7 @@ use warnings;
 use LIFinder::DBManager;
 use LIFinder::FileLister;
 use LIFinder::TokenHash;
+use LIFinder::LicenseIndentifier;
 use File::Spec::Functions 'catfile';
 
 =head1 NAME
@@ -37,6 +38,8 @@ sub process {
 	my ($input_dirs_ref, $output_dir, $file_types) = @_;
 	my @input_dirs = @{ $input_dirs_ref };
 
+	my $occurance_threshold = 2;
+
 	my %common_parameters = ();
 
 	# step 0: create output dir, initialize database
@@ -61,6 +64,12 @@ sub process {
 		file_types => $file_types,
 		output_dir => $output_dir);
 	LIFinder::TokenHash->new(%parameter_step2)->execute();
+
+	# step 3: identify license of files
+	my %parameter_step3 = (%common_parameters,
+		occurance_threshold => $occurance_threshold);
+	LIFinder::LicenseIndentifier->new(%parameter_step3)->execute();
+
 
 	$dbm->closedb();
 }
