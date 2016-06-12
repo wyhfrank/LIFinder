@@ -13,16 +13,11 @@ my @creat_list = (
     # dir path: /dir
     # ext: .cpp
 	q{CREATE TABLE IF NOT EXISTS files
-		(path TEXT, ext TEXT, token_info_id INT, group_id INT, 
+		(path TEXT, ext TEXT, token_info_id INT, 
 		license TEXT, dir_id INT,
         FOREIGN KEY(token_info_id) REFERENCES token_info(oid),
-        FOREIGN KEY(group_id) REFERENCES groups(oid),
         FOREIGN KEY(dir_id) REFERENCES dirs(oid),
 		PRIMARY KEY(path, ext, dir_id));},
-	q{CREATE TABLE IF NOT EXISTS groups
-		(token_info_id INT, num_of_lic INT, none INT, unknown INT,
-        FOREIGN KEY(token_info_id) REFERENCES token_info(oid)
-		);},
 	q{CREATE TABLE IF NOT EXISTS token_info
 		(hash TEXT PRIMARY KEY, 
 		length INT, occurance INT);},
@@ -53,23 +48,18 @@ my %sth_table = (
 
     # occurance => (token_info_id)
     s_token => q{SELECT oid FROM token_info WHERE occurance >= ?;},
-    # token_info_id => (file_id, dir_path, file_path, file_ext)
-    s_file_with_token_id => q{SELECT f.oid, d.path, f.path, f.ext FROM files f 
+    # token_info_id => (file_id, license, dir_path, file_path, file_ext)
+    s_file_by_token_id => q{SELECT f.oid, f.license, d.path, f.path, f.ext FROM files f 
         INNER JOIN dirs d ON f.dir_id = d.oid WHERE f.token_info_id = ?;},
-    i_group => q{INSERT OR IGNORE INTO groups 
-        (token_info_id, num_of_lic, none, unknown) VALUES (?, ?, ?, ?);},
-    # license, file_id, file_id [CAUTION: file_id need to be passed twice]
-    u_file_license => q{UPDATE files SET license = ?, group_id = 
-        (SELECT oid FROM groups WHERE groups.token_info_id = 
-        (SELECT token_info_id FROM files WHERE oid = ?))
-        WHERE oid = ?;},
 
-    # lic_sep, nol_threshold, lot_threshold => (gid, nol, none, unknown, 
-    #   licenses, distinct_dir_count)
-    s_group => q{SELECT g.oid, num_of_lic, none, unknown, GROUP_CONCAT(license, ?),
-        COUNT(DISTINCT dir_id) FROM groups g INNER JOIN files f ON g.oid=f.group_id
-        INNER JOIN token_info t ON t.oid=f.token_info_id
-        WHERE g.num_of_lic >= ? AND t.length > ? GROUP BY g.oid ORDER BY license;},
+    # license, file_id
+    u_file_license => q{UPDATE files SET license = ? WHERE oid = ?;},
+
+    # lic_sep, lot_threshold, occurance => (tid, licenses, distinct_dir_count)
+    s_group => q{SELECT t.oid, GROUP_CONCAT(license, ?), COUNT(DISTINCT dir_id) 
+        FROM files f INNER JOIN token_info t ON t.oid=f.token_info_id
+        WHERE t.length > ? AND t.occurance >= ?
+        GROUP BY t.oid ORDER BY license;},
     );
 
 sub new {

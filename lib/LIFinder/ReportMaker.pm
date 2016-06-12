@@ -19,6 +19,8 @@ sub new {
         $args->{num_of_lic_threshold} : 2;
     $self->{min_token_len} = exists $args->{min_token_len} ?
         $args->{min_token_len} : 50;
+    $self->{occurance_threshold} = exists $args->{occurance_threshold} ?
+        $args->{occurance_threshold} : 2;
 
     return $self;
 }
@@ -30,24 +32,67 @@ sub get_desc {
 sub execute {
     my ($self) = @_;
 
+    my $results = $self->fetch_groups();
+
+    $self->output_results($results);
+}
+
+sub fetch_groups {
+    my ($self) = @_;
+
+    my @results;
+
     my $dbm = $self->{dbm};
-
-    my $fh = $self->create_report_file();
-
-    my $sep = ';'; # Seporator used to concat licenses
+    my $sep = ';'; # Separator used to concat licenses
     my $group_sth = $dbm->execute('s_group', $sep, 
-        $self->{num_of_lic_threshold}, $self->{min_token_len});
+        $self->{min_token_len}, $self->{occurance_threshold});
 
-    my @header = qw(GroupID #Licenses #None #Unkown Licenses);
-    say $fh join_line(@header);
+    foreach my $row_ref (@{$group_sth->fetchall_arrayref}) {
+        my ($token_id, $licenses, $dir_count) = @$row_ref;
 
-    while (my @group_row = $group_sth->fetchrow_array) {
+        my ($nol, $non, $nou) = calc_metrics($licenses, $sep);
 
         # skip groups that contain files under one directory, in inter_dir mode
-        my $dir_count = pop @group_row;
         next if $self->{inter_dir} and $dir_count <= 1;
 
-        my $line = join_line(@group_row);
+        push @results, [$token_id, $nol, $non, $nou, $licenses];
+    }
+    return \@results;
+}
+
+sub calc_metrics {
+    my ($licenses_str, $sep) = @_;
+
+    my @licenses = split /$sep/, $licenses_str;
+
+    my $license_count_table = {};
+
+    foreach my $lic (@licenses) {
+        my $norm_lic = lc $lic;
+        $license_count_table->{$norm_lic}++;
+    }
+
+    my $num_of_none = $license_count_table->{none} ? 
+        $license_count_table->{none} : 0;
+    my $num_of_unknown = $license_count_table->{unknown} ? 
+        $license_count_table->{unknown} : 0;
+
+    my $num_of_lic = keys %$license_count_table;
+    $num_of_lic += $num_of_unknown - 1 if $num_of_unknown;
+
+    return ($num_of_lic, $num_of_none, $num_of_unknown);
+}
+
+sub output_results {
+    my ($self, $results) = @_;
+
+    my $fh = $self->create_report_file();
+    my @header = qw(TokenID #Licenses #None #Unknown Licenses);
+    say $fh join_line(@header);
+
+    foreach my $row_ref (@$results) {
+
+        my $line = join_line(@$row_ref);
         say $fh $line;
     }
 
