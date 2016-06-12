@@ -32,7 +32,7 @@ sub execute {
 
     my $dbm = $self->{dbm};
     my @types = split /,/, $self->{file_types};
-    my @exts = map { '.' . $_ } @types;
+    my @exts = map { '.' . $_ } @types; # prepend dot
 
     my $token_info_id = 0;
     foreach my $ext (@exts) {
@@ -49,7 +49,11 @@ sub execute {
         next unless scalar(@$ary_ref) > 0;
 
         foreach my $row_ref (@$ary_ref) {
-            my ($f_id, $dir, $path) = @$row_ref;
+            my ($f_id, $token_id, $dir, $path) = @$row_ref;
+
+            # skip if this file has been processed before
+            next if $token_id;
+
             my $full_path = join('', $dir, $path, $ext);
 
             # print "$full_path\n";
@@ -59,6 +63,9 @@ sub execute {
                 );
             push @file_list, \%file_item;
         }
+
+        # skip if no files were found
+        next if $#file_list <= 0;
 
         # remove leading dot, convert to lowercase
         my $normalized_ext = substr($ext, 1) if (substr($ext, 0, 1) eq '.');

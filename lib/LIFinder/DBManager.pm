@@ -33,9 +33,9 @@ my %sth_table = (
     i_file => q{INSERT OR IGNORE INTO files (path, ext, dir_id) 
             VALUES (?, ?, (SELECT oid FROM dirs WHERE path = ?));},
 
-    # file_ext => (file_id, dir_path, file_path)
-    s_file => q{SELECT files.oid, dirs.path, files.path FROM
-        files INNER JOIN dirs ON files.dir_id = dirs.oid WHERE files.ext = ?;},
+    # file_ext => (file_id, token_info_id dir_path, file_path)
+    s_file => q{SELECT f.oid, f.token_info_id, d.path, f.path FROM
+        files f INNER JOIN dirs d ON f.dir_id = d.oid WHERE f.ext = ?;},
     # hash, length
     i_token => q{INSERT OR IGNORE INTO token_info 
         (hash, length, occurrence) VALUES (?, ?, 0);},
