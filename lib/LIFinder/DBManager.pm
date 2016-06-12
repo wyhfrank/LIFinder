@@ -85,7 +85,7 @@ sub createdb {
     my $database = catfile($self->{output_dir}, $db_name);
 
     # TODO: add option for deleting
-    unlink $database if -f $database;
+    # unlink $database if -f $database;
 
     my $driver   = "SQLite";
     my $dsn = "DBI:$driver:dbname=$database";
