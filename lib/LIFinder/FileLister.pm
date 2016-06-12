@@ -6,17 +6,17 @@ use File::Find;
 use File::Basename;
 
 sub new {
-    my ($class, %args) = @_;
+    my ($class, $args) = @_;
 
     my $self = bless({}, $class);
 
-    die "parameter 'input_dirs_ref' is mandatory" unless exists $args{input_dirs_ref};
-    die "parameter 'dbm' is mandatory" unless exists $args{dbm};
-    die "parameter 'file_types' is mandatory" unless exists $args{file_types};
+    die "parameter 'input_dirs_ref' is mandatory" unless exists $args->{input_dirs_ref};
+    die "parameter 'dbm' is mandatory" unless exists $args->{dbm};
+    die "parameter 'file_types' is mandatory" unless exists $args->{file_types};
 
-    $self->{input_dirs_ref} = $args{input_dirs_ref};
-    $self->{file_types} = $args{file_types};
-    $self->{dbm} = $args{dbm};
+    $self->{input_dirs_ref} = $args->{input_dirs_ref};
+    $self->{file_types} = $args->{file_types};
+    $self->{dbm} = $args->{dbm};
 
     return $self;
 }

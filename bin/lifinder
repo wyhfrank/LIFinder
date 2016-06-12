@@ -5,25 +5,31 @@ use warnings;
 use Getopt::Std;
 use LIFinder;
 
-my %opts = parse_cmdline_parameters();
-my @input_dirs = @ARGV;
-my $output_dir = '.';
-my $file_types = 'c,cpp,java';
-my $min_token_len = 50;
-$output_dir = $opts{o} if exists $opts{o};
-$file_types = $opts{t} if exists $opts{t};
-$min_token_len = $opts{l} if exists $opts{l};
-my $inter_dir = exists $opts{i};
+my $params = parse_cmdline_parameters();
 
-my $license_result = LIFinder::process(\@input_dirs, $output_dir, 
-	$file_types, $inter_dir, $min_token_len);
+my $license_result = LIFinder::process($params);
 # print "done.\n";
 exit 0;
 
 sub parse_cmdline_parameters {
     my %opts = ();
     if (!getopts('o:t:il:', \%opts) || scalar(@ARGV) == 0) {
-        print STDERR <<"END";
+
+    	usage();
+        exit 1;
+    }
+
+    my %params = ();
+	$params{output_root} = (exists $opts{o}) ? $opts{o} : '.';
+	$params{file_types} = (exists $opts{t}) ? $opts{t} : 'c,cpp,java';
+	$params{min_token_len} = (exists $opts{l}) ? $opts{l} : 50;
+	$params{inter_dir} = exists $opts{i};
+	$params{input_dirs_ref} = \@ARGV;
+    return \%params;
+}
+
+sub usage {
+	print STDERR <<END;
 LIFinder v${LIFinder::VERSION}
 
 Usage: $0 [options] <dir1> <dir2> ...
@@ -39,10 +45,7 @@ Options:
   
 END
   # -f force refreshing the database
-  
-        exit 1;
-    }
-    return %opts;
+
 }
 
 __END__

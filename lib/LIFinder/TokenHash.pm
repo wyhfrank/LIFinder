@@ -8,17 +8,17 @@ use File::Spec::Functions 'catfile';
 
 my $ccfx_default_cmd = 'ccfx';
 sub new {
-    my ($class, %args) = @_;
+    my ($class, $args) = @_;
 
     my $self = bless({}, $class);
 
-    die "parameter 'dbm' is mandatory" unless exists $args{dbm};
-    die "parameter 'file_types' is mandatory" unless exists $args{file_types};
-    die "parameter 'output_dir' is mandatory" unless exists $args{output_dir};
+    die "parameter 'dbm' is mandatory" unless exists $args->{dbm};
+    die "parameter 'file_types' is mandatory" unless exists $args->{file_types};
+    die "parameter 'output_dir' is mandatory" unless exists $args->{output_dir};
 
-    $self->{dbm} = $args{dbm};
-    $self->{file_types} = $args{file_types};
-    $self->{output_dir} = $args{output_dir};
+    $self->{dbm} = $args->{dbm};
+    $self->{file_types} = $args->{file_types};
+    $self->{output_dir} = $args->{output_dir};
 
     return $self;
 }

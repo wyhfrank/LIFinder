@@ -73,13 +73,13 @@ my %sth_table = (
     );
 
 sub new {
-    my ($class, %args) = @_;
+    my ($class, $args) = @_;
 
     my $self = bless({}, $class);
 
-    die "parameter 'output_dir' is mandatory" unless exists $args{output_dir};
+    die "parameter 'output_dir' is mandatory" unless exists $args->{output_dir};
 
-    $self->{output_dir} = $args{output_dir};
+    $self->{output_dir} = $args->{output_dir};
 
     return $self;
 }
@@ -88,7 +88,7 @@ sub createdb {
     my ($self) = @_;
 
     if (defined $self->{dbh}) {
-        return 0;
+        return $self;
     }
 
     my $db_name = 'result.db';

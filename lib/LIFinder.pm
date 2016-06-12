@@ -40,53 +40,32 @@ Perhaps a little code snippet.
 
 
 sub process {
-	my ($input_dirs_ref, $output_dir, $file_types, 
-		$inter_dir, $min_token_len) = @_;
-
-	my @input_dirs = @{ $input_dirs_ref };
+	my ($params) = @_;
 
 	# only select tokens that occur more than
-	my $occurance_threshold = 2;
+	$params->{occurance_threshold} = 2;
 
 	my $time_cost = 0;
-	my %common_parameters = ();
 
 	# step 0: create output dir, initialize database
-	$output_dir = _init_output_dir($output_dir);
-	my %parameter_step0 = (%common_parameters, 
-		output_dir => $output_dir);
+	$params->{output_dir} = _init_output_dir($params->{output_root});
 
-	my $dbm = LIFinder::DBManager->new(%parameter_step0);
-
+	my $dbm = LIFinder::DBManager->new($params);
 	$dbm->createdb()->prepare_all();
-	$common_parameters{dbm} = $dbm;
+	$params->{dbm} = $dbm;
 
 	# step 1: list files in specified directories
-	my %parameter_step1 = (%common_parameters, 
-		input_dirs_ref => $input_dirs_ref,
-		file_types => $file_types);
-	$time_cost += _execute_step('LIFinder::FileLister', \%parameter_step1);
+	$time_cost += _execute_step('LIFinder::FileLister', $params);
 
 	# step 2: tokenize the files and save the hash value
 	#	of the normalized tokens
-	my %parameter_step2 = (%common_parameters,
-		file_types => $file_types,
-		output_dir => $output_dir);
-	$time_cost += _execute_step('LIFinder::TokenHash', \%parameter_step2);
-
+	$time_cost += _execute_step('LIFinder::TokenHash', $params);
 
 	# step 3: identify license of files and calculate group metrics
-	my %parameter_step3 = (%common_parameters,
-		occurance_threshold => $occurance_threshold);
-	$time_cost += _execute_step('LIFinder::LicenseIndentifier', \%parameter_step3);
+	$time_cost += _execute_step('LIFinder::LicenseIndentifier', $params);
 
 	# step 4: make report about license inconsistency
-	my %parameter_step4 = (%common_parameters,
-		output_dir => $output_dir,
-		inter_dir => $inter_dir,
-		min_token_len => $min_token_len,
-		);
-	$time_cost += _execute_step('LIFinder::ReportMaker', \%parameter_step4);
+	$time_cost += _execute_step('LIFinder::ReportMaker', $params);
 
 	report_time_cost('Total', $time_cost);
 
@@ -107,7 +86,7 @@ sub _init_output_dir {
 sub _execute_step {
 	my ($class_name, $parameter) = @_;
 
-	my $obj = $class_name->new(%$parameter);
+	my $obj = $class_name->new($parameter);
 	die "Class $class_name has no execute()\n" 
 		unless $obj->can('execute');
 

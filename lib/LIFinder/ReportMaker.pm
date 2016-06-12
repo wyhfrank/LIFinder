@@ -5,20 +5,20 @@ use strict;
 use File::Spec::Functions 'catfile';
 
 sub new {
-    my ($class, %args) = @_;
+    my ($class, $args) = @_;
 
     my $self = bless({}, $class);
 
-    die "parameter 'dbm' is mandatory" unless exists $args{dbm};
-    die "parameter 'output_dir' is mandatory" unless exists $args{output_dir};
+    die "parameter 'dbm' is mandatory" unless exists $args->{dbm};
+    die "parameter 'output_dir' is mandatory" unless exists $args->{output_dir};
 
-    $self->{dbm} = $args{dbm};
-    $self->{output_dir} = $args{output_dir};
-    $self->{inter_dir} = $args{inter_dir};
-    $self->{num_of_lic_threshold} = exists $args{num_of_lic_threshold} ?
-        $args{num_of_lic_threshold} : 2;
-    $self->{min_token_len} = exists $args{min_token_len} ?
-        $args{min_token_len} : 50;
+    $self->{dbm} = $args->{dbm};
+    $self->{output_dir} = $args->{output_dir};
+    $self->{inter_dir} = $args->{inter_dir};
+    $self->{num_of_lic_threshold} = exists $args->{num_of_lic_threshold} ?
+        $args->{num_of_lic_threshold} : 2;
+    $self->{min_token_len} = exists $args->{min_token_len} ?
+        $args->{min_token_len} : 50;
 
     return $self;
 }

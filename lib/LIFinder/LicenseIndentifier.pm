@@ -6,15 +6,15 @@ use strict;
 my $ninka_default_cmd = 'ninka';
 
 sub new {
-    my ($class, %args) = @_;
+    my ($class, $args) = @_;
 
     my $self = bless({}, $class);
 
-    die "parameter 'dbm' is mandatory" unless exists $args{dbm};
+    die "parameter 'dbm' is mandatory" unless exists $args->{dbm};
 
-    $self->{dbm} = $args{dbm};
-    $self->{occurance_threshold} = exists $args{occurance_threshold} ?
-        $args{occurance_threshold} : 2;
+    $self->{dbm} = $args->{dbm};
+    $self->{occurance_threshold} = exists $args->{occurance_threshold} ?
+        $args->{occurance_threshold} : 2;
 
     my $ninka_cmd = $ENV{NINKA} ?
         $ENV{NINKA} : $ninka_default_cmd;
