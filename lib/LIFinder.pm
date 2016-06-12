@@ -38,12 +38,27 @@ Perhaps a little code snippet.
 
 =cut
 
+my @step_class = (
+	# step 1: list files in specified directories
+	'LIFinder::FileLister',
+	# step 2: tokenize the files and save the hash value
+	#	of the normalized tokens
+	'LIFinder::TokenHash',
+	# step 3: identify license of files and calculate group metrics
+	'LIFinder::LicenseIndentifier',
+	# step 4: make report about license inconsistency
+	'LIFinder::ReportMaker',
+	);
+
 
 sub process {
 	my ($params) = @_;
 
 	# only select tokens that occur more than
 	$params->{occurance_threshold} = 2;
+
+	my @step_switch = _step_switch($params->{step_switch}, 
+		scalar(@step_class));
 
 	my $time_cost = 0;
 
@@ -54,18 +69,17 @@ sub process {
 	$dbm->createdb()->prepare_all();
 	$params->{dbm} = $dbm;
 
-	# step 1: list files in specified directories
-	$time_cost += _execute_step('LIFinder::FileLister', $params);
+	for (my $i = 0; $i <= $#step_class; $i++) {
+		my $step = $step_class[$i];
 
-	# step 2: tokenize the files and save the hash value
-	#	of the normalized tokens
-	$time_cost += _execute_step('LIFinder::TokenHash', $params);
+		if ($step_switch[$i]) {
 
-	# step 3: identify license of files and calculate group metrics
-	$time_cost += _execute_step('LIFinder::LicenseIndentifier', $params);
+			$time_cost += _execute_step($step, $params);
 
-	# step 4: make report about license inconsistency
-	$time_cost += _execute_step('LIFinder::ReportMaker', $params);
+		} else {
+			_skip_step($step);
+		}
+	}
 
 	report_time_cost('Total', $time_cost);
 
@@ -81,6 +95,25 @@ sub _init_output_dir {
 	my $output_dir = catfile($output_root, 'output');
 	mkdir $output_dir;
 	return $output_dir;
+}
+
+sub _step_switch {
+	my ($exp, $count) = @_;
+
+	my $sum = 0;
+	map { $sum+=$_ } split '\+', $exp;
+
+	# say "Step switch sum: $sum";
+
+	my @on_list;
+	for (my $i = 0; $i < $count; $i++) {
+
+		my $is_on = $sum & 1;
+		push @on_list, $is_on;
+
+		$sum = $sum >> 1;
+	}
+	return @on_list;
 }
 
 sub _execute_step {
@@ -102,6 +135,19 @@ sub _execute_step {
 	report_time_cost($desc, $time_elapsed);
 
 	return $time_elapsed;
+}
+
+sub _skip_step {
+	my ($class_name) = @_;
+
+	my $desc = $class_name;
+
+	# TODO: how to call class function dynamically
+	# eval {
+	# 	$desc = &$class_name::get_desc();
+	# };
+
+	say $desc .' skipped.';	
 }
 
 sub report_time_cost {
