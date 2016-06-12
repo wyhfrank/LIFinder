@@ -55,6 +55,9 @@ sub fetch_groups {
         # skip groups that contain files under one directory, in inter_dir mode
         next if $self->{inter_dir} and $dir_count <= 1;
 
+	# skip if numer-of-licenses is under threshold
+	next if $nol < $self->{num_of_lic_threshold};
+
         push @results, [$token_id, $nol, $non, $nou, $licenses];
     }
     return \@results;
