@@ -20,7 +20,7 @@ my @creat_list = (
 		PRIMARY KEY(path, ext, dir_id));},
 	q{CREATE TABLE IF NOT EXISTS token_info
 		(hash TEXT PRIMARY KEY, 
-		length INT, occurance INT);},
+		length INT, occurrence INT);},
 	q{CREATE TABLE IF NOT EXISTS dirs
 		(path TEXT PRIMARY KEY
 		);},
@@ -38,16 +38,16 @@ my %sth_table = (
         files INNER JOIN dirs ON files.dir_id = dirs.oid WHERE files.ext = ?;},
     # hash, length
     i_token => q{INSERT OR IGNORE INTO token_info 
-        (hash, length, occurance) VALUES (?, ?, 0);},
+        (hash, length, occurrence) VALUES (?, ?, 0);},
     # hash
-    u_token => q{UPDATE token_info SET occurance = occurance+1 
+    u_token => q{UPDATE token_info SET occurrence = occurrence+1 
         WHERE hash = ?;},
     # hash, file_id
     u_file => q{UPDATE files SET token_info_id = 
         (SELECT oid FROM token_info WHERE hash = ?) WHERE oid = ?;},
 
-    # occurance => (token_info_id)
-    s_token => q{SELECT oid FROM token_info WHERE occurance >= ?;},
+    # occurrence => (token_info_id)
+    s_token => q{SELECT oid FROM token_info WHERE occurrence >= ?;},
     # token_info_id => (file_id, license, dir_path, file_path, file_ext)
     s_file_by_token_id => q{SELECT f.oid, f.license, d.path, f.path, f.ext FROM files f 
         INNER JOIN dirs d ON f.dir_id = d.oid WHERE f.token_info_id = ?;},
@@ -55,10 +55,10 @@ my %sth_table = (
     # license, file_id
     u_file_license => q{UPDATE files SET license = ? WHERE oid = ?;},
 
-    # lic_sep, lot_threshold, occurance => (tid, licenses, distinct_dir_count)
+    # lic_sep, lot_threshold, occurrence => (tid, licenses, distinct_dir_count)
     s_group => q{SELECT t.oid, GROUP_CONCAT(license, ?), COUNT(DISTINCT dir_id) 
         FROM files f INNER JOIN token_info t ON t.oid=f.token_info_id
-        WHERE t.length > ? AND t.occurance >= ?
+        WHERE t.length > ? AND t.occurrence >= ?
         GROUP BY t.oid ORDER BY license;},
     );
 

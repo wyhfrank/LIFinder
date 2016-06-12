@@ -13,8 +13,8 @@ sub new {
     die "parameter 'dbm' is mandatory" unless exists $args->{dbm};
 
     $self->{dbm} = $args->{dbm};
-    $self->{occurance_threshold} = exists $args->{occurance_threshold} ?
-        $args->{occurance_threshold} : 2;
+    $self->{occurrence_threshold} = exists $args->{occurrence_threshold} ?
+        $args->{occurrence_threshold} : 2;
 
     my $ninka_cmd = $ENV{NINKA} ?
         $ENV{NINKA} : $ninka_default_cmd;
@@ -35,7 +35,7 @@ sub execute {
 
     my $dbm = $self->{dbm};
 
-    my $token_sth = $dbm->execute('s_token', $self->{occurance_threshold});
+    my $token_sth = $dbm->execute('s_token', $self->{occurrence_threshold});
 
     # for each token that occurred more than the threshold
     while (my @token_row = $token_sth->fetchrow_array) {

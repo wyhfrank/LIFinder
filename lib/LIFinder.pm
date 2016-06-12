@@ -55,7 +55,7 @@ sub process {
 	my ($params) = @_;
 
 	# only select tokens that occur more than
-	$params->{occurance_threshold} = 2;
+	$params->{occurrence_threshold} = 2;
 
 	my @step_switch = _step_switch($params->{step_switch}, 
 		scalar(@step_class));

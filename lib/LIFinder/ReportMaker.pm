@@ -19,8 +19,8 @@ sub new {
         $args->{num_of_lic_threshold} : 2;
     $self->{min_token_len} = exists $args->{min_token_len} ?
         $args->{min_token_len} : 50;
-    $self->{occurance_threshold} = exists $args->{occurance_threshold} ?
-        $args->{occurance_threshold} : 2;
+    $self->{occurrence_threshold} = exists $args->{occurrence_threshold} ?
+        $args->{occurrence_threshold} : 2;
 
     return $self;
 }
@@ -45,7 +45,7 @@ sub fetch_groups {
     my $dbm = $self->{dbm};
     my $sep = ';'; # Separator used to concat licenses
     my $group_sth = $dbm->execute('s_group', $sep, 
-        $self->{min_token_len}, $self->{occurance_threshold});
+        $self->{min_token_len}, $self->{occurrence_threshold});
 
     foreach my $row_ref (@{$group_sth->fetchall_arrayref}) {
         my ($token_id, $licenses, $dir_count) = @$row_ref;
