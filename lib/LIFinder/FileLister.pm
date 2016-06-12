@@ -57,7 +57,7 @@ sub execute {
 sub _get_files_under {
     my ($root_dir, $types_ref) = @_;
     my @types = @{$types_ref};
-    my $pattern = '(' . join('|', @types) . ')$'; # file extension filter
+    my $pattern = '\.(' . join('|', @types) . ')$'; # file extension filter
 
     # print "Extension filter is : $pattern\n";
 
