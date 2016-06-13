@@ -7,7 +7,7 @@ use Test::More;
 plan tests => 1;
 
 BEGIN {
-    use_ok( 'LIFinder' ) || print "Bail out!\n";
+    use_ok('LIFinder') || print "Bail out!\n";
 }
 
-diag( "Testing LIFinder $LIFinder::VERSION, Perl $], $^X" );
+diag("Testing LIFinder $LIFinder::VERSION, Perl $], $^X");

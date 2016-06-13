@@ -24,7 +24,6 @@ Version 0.01
 
 our $VERSION = '0.01';
 
-
 =head1 SYNOPSIS
 
 Quick summary of what the module does.
@@ -39,124 +38,125 @@ Perhaps a little code snippet.
 =cut
 
 my @step_class = (
-	# step 1: list files in specified directories
-	'LIFinder::FileLister',
-	# step 2: tokenize the files and save the hash value
-	#	of the normalized tokens
-	'LIFinder::TokenHash',
-	# step 3: identify license of files and calculate group metrics
-	'LIFinder::LicenseIndentifier',
-	# step 4: make report about license inconsistency
-	'LIFinder::ReportMaker',
-	);
 
+    # step 1: list files in specified directories
+    'LIFinder::FileLister',
+
+    # step 2: tokenize the files and save the hash value
+    #	of the normalized tokens
+    'LIFinder::TokenHash',
+
+    # step 3: identify license of files and calculate group metrics
+    'LIFinder::LicenseIndentifier',
+
+    # step 4: make report about license inconsistency
+    'LIFinder::ReportMaker',
+);
 
 sub process {
-	my ($params) = @_;
+    my ($params) = @_;
 
-	# only select tokens that occur more than
-	$params->{occurrence_threshold} = 2;
+    # only select tokens that occur more than
+    $params->{occurrence_threshold} = 2;
 
-	my @step_switch = _step_switch($params->{step_switch}, 
-		scalar(@step_class));
+    my @step_switch =
+      _step_switch( $params->{step_switch}, scalar(@step_class) );
 
-	my $time_cost = 0;
+    my $time_cost = 0;
 
-	# step 0: create output dir, initialize database
-	$params->{output_dir} = _init_output_dir($params->{output_root});
+    # step 0: create output dir, initialize database
+    $params->{output_dir} = _init_output_dir( $params->{output_root} );
 
-	my $dbm = LIFinder::DBManager->new($params);
-	$dbm->createdb()->prepare_all();
-	$params->{dbm} = $dbm;
+    my $dbm = LIFinder::DBManager->new($params);
+    $dbm->createdb()->prepare_all();
+    $params->{dbm} = $dbm;
 
-	for (my $i = 0; $i <= $#step_class; $i++) {
-		my $step = $step_class[$i];
+    for ( my $i = 0 ; $i <= $#step_class ; $i++ ) {
+        my $step = $step_class[$i];
 
-		if ($step_switch[$i]) {
+        if ( $step_switch[$i] ) {
 
-			$time_cost += _execute_step($step, $params);
+            $time_cost += _execute_step( $step, $params );
 
-		} else {
-			_skip_step($step);
-		}
-	}
+        }
+        else {
+            _skip_step($step);
+        }
+    }
 
-	report_time_cost('Total', $time_cost);
+    report_time_cost( 'Total', $time_cost );
 
-	$dbm->closedb();
+    $dbm->closedb();
 }
 
 sub _init_output_dir {
-	my $output_root = shift;
+    my $output_root = shift;
 
-	die "Directory does not exist: $output_root\n"
-		if !-d $output_root;
+    die "Directory does not exist: $output_root\n"
+      if !-d $output_root;
 
-	my $output_dir = catfile($output_root, 'output');
-	mkdir $output_dir;
-	return $output_dir;
+    my $output_dir = catfile( $output_root, 'output' );
+    mkdir $output_dir;
+    return $output_dir;
 }
 
 sub _step_switch {
-	my ($exp, $count) = @_;
+    my ( $exp, $count ) = @_;
 
-	my $sum = 0;
-	map { $sum+=$_ } split '\+', $exp;
+    my $sum = 0;
+    map { $sum += $_ } split '\+', $exp;
 
-	# say "Step switch sum: $sum";
+    # say "Step switch sum: $sum";
 
-	my @on_list;
-	for (my $i = 0; $i < $count; $i++) {
+    my @on_list;
+    for ( my $i = 0 ; $i < $count ; $i++ ) {
 
-		my $is_on = $sum & 1;
-		push @on_list, $is_on;
+        my $is_on = $sum & 1;
+        push @on_list, $is_on;
 
-		$sum = $sum >> 1;
-	}
-	return @on_list;
+        $sum = $sum >> 1;
+    }
+    return @on_list;
 }
 
 sub _execute_step {
-	my ($class_name, $parameter) = @_;
+    my ( $class_name, $parameter ) = @_;
 
-	my $obj = $class_name->new($parameter);
-	die "Class $class_name has no execute()\n" 
-		unless $obj->can('execute');
+    my $obj = $class_name->new($parameter);
+    die "Class $class_name has no execute()\n"
+      unless $obj->can('execute');
 
-	my $old_time = gettimeofday;
-	
-	$obj->execute();
-	
-	my $time_elapsed = gettimeofday - $old_time;
+    my $old_time = gettimeofday;
 
-	my $desc = $obj->can('get_desc')?
-		$obj->get_desc() : $class_name;
+    $obj->execute();
 
-	report_time_cost($desc, $time_elapsed);
+    my $time_elapsed = gettimeofday - $old_time;
 
-	return $time_elapsed;
+    my $desc = $obj->can('get_desc') ? $obj->get_desc() : $class_name;
+
+    report_time_cost( $desc, $time_elapsed );
+
+    return $time_elapsed;
 }
 
 sub _skip_step {
-	my ($class_name) = @_;
+    my ($class_name) = @_;
 
-	my $desc = $class_name;
+    my $desc = $class_name;
 
-	# TODO: how to call class function dynamically
-	# eval {
-	# 	$desc = &$class_name::get_desc();
-	# };
+    # TODO: how to call class function dynamically
+    # eval {
+    # 	$desc = &$class_name::get_desc();
+    # };
 
-	say $desc .' skipped.';	
+    say $desc . ' skipped.';
 }
 
 sub report_time_cost {
-	my ($desc, $time) = @_;
+    my ( $desc, $time ) = @_;
 
-	say sprintf "%s: %.3fs", $desc, $time;	
+    say sprintf "%s: %.3fs", $desc, $time;
 }
-
-
 
 =head1 AUTHOR
 
@@ -183,4 +183,4 @@ if not, write to the Free Software Foundation, Inc.,
 
 =cut
 
-1; # End of LIFinder
+1;    # End of LIFinder

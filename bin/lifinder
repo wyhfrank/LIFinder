@@ -8,29 +8,30 @@ use LIFinder;
 my $params = parse_cmdline_parameters();
 
 my $license_result = LIFinder::process($params);
+
 # print "done.\n";
 exit 0;
 
 sub parse_cmdline_parameters {
     my %opts = ();
-    if (!getopts('o:t:il:s:', \%opts) || scalar(@ARGV) == 0) {
+    if ( !getopts( 'o:t:il:s:', \%opts ) || scalar(@ARGV) == 0 ) {
 
-    	usage();
+        usage();
         exit 1;
     }
 
     my %params = ();
-	$params{output_root} = (exists $opts{o}) ? $opts{o} : '.';
-	$params{file_types} = (exists $opts{t}) ? $opts{t} : 'c,cpp,java';
-  $params{min_token_len} = (exists $opts{l}) ? $opts{l} : 50;
-	$params{step_switch} = (exists $opts{s}) ? $opts{s} : hex '0xFFFF';
-	$params{inter_dir} = exists $opts{i};
-	$params{input_dirs_ref} = \@ARGV;
+    $params{output_root}   = ( exists $opts{o} ) ? $opts{o} : '.';
+    $params{file_types}    = ( exists $opts{t} ) ? $opts{t} : 'c,cpp,java';
+    $params{min_token_len} = ( exists $opts{l} ) ? $opts{l} : 50;
+    $params{step_switch}   = ( exists $opts{s} ) ? $opts{s} : hex '0xFFFF';
+    $params{inter_dir}     = exists $opts{i};
+    $params{input_dirs_ref} = \@ARGV;
     return \%params;
 }
 
 sub usage {
-	print STDERR <<END;
+    print STDERR <<END;
 LIFinder v${LIFinder::VERSION}
 
 Usage: $0 [options] <dir1> <dir2> ...
@@ -45,19 +46,18 @@ Options:
   -l minimal length of token to be considered as file clones, default 50
 
   -s steps to be executed, value should be the sum of the following:
-     1: list files
-     2: generate tokens and calculate hash
-     4: identify licenses
-     8: make reports
+      1: list files
+      2: generate tokens and calculate hash
+      4: identify licenses
+      8: make reports
 
-     e.g.
-     -s 8: only make reports
-     -s 2+4+8: skip file listing step
-     -s 14: same as above
-  
+      e.g.
+      -s 8: only make reports
+      -s 2+4+8: skip file listing step
+      -s 14: same as above
 END
-  # -f force refreshing the database
 
+    # -f force refreshing the database
 }
 
 __END__
