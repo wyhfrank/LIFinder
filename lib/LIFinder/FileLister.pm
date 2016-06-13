@@ -65,7 +65,9 @@ sub _get_files_under {
     find(sub {
         return unless -f;
         return unless /$pattern/i;
+
         my $name = $File::Find::name;
+        # TODO: whether dir ends with '/', unify them
         my $file_path = substr $name, length $root_dir; # substract root part
         push @files, $file_path;
     }, $root_dir);
