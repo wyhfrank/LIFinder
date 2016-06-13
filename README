@@ -17,20 +17,57 @@ PRE-REQUESTS
 
 	Ninka (https://github.com/dmgerman/ninka)
 
+Please make sure you can run these two tools in the console by:
+
+	$ ccfx
+	CCFinderX ver. 10.2.7.4 for Windows XP x86 (C) 2009-2010 AIST
+and
+	$ ninka
+	Ninka v1.3
+	Usage: ninka [options] <filename>
+	...
+
+Alternatively, you can set two environment variables in your profile:
+
+	CCFX=/usr/local/ccfx/ubuntu32/ccfx
+	NINKA=/usr/local/ninka/bin/ninka
+
 
 INSTALLATION
 
 To install this module, run the following commands:
 
-	perl Build.PL
-	./Build
-	./Build test
-	./Build install
+	$ perl Build.PL
+	$ ./Build
+	$ ./Build test
+	$ ./Build install
 
 
 HOW TO USE
 
-	lifinder -t c,cpp,java <dir1> <dir2>
+To read the usage, simple run the command without arguments:
+
+	$ lifinder
+
+To report license inconsistencies of c, cpp and java files under <dir1> and <dir2>:
+
+	$ lifinder <dir1> <dir2>
+
+
+OUTPUT
+
+Results are generated in the *output* directory under the directory specified
+by -o switch (default is the current directory).
+
+
+TODO
+
+	* Add a detailed report in addition to the current group level report.
+	* Add perl tests for each module.
+	* Support more programming language.
+	* Add more usage information in this README file.
+	* Complete the documentation for source code.
+
 
 LICENSE AND COPYRIGHT
 
