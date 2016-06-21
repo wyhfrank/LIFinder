@@ -15,8 +15,8 @@ sub new {
     $self->{dbm}        = $args->{dbm};
     $self->{output_dir} = $args->{output_dir};
     $self->{inter_dir}  = $args->{inter_dir};
-    $self->{num_of_lic_threshold} =
-      exists $args->{num_of_lic_threshold} ? $args->{num_of_lic_threshold} : 2;
+    $self->{min_licenses} =
+      exists $args->{min_licenses} ? $args->{min_licenses} : 2;
     $self->{min_token_len} =
       exists $args->{min_token_len} ? $args->{min_token_len} : 50;
     $self->{occurrence_threshold} =
@@ -59,7 +59,7 @@ sub fetch_groups {
         next if $self->{inter_dir} and $dir_count <= 1;
 
         # skip if numer-of-licenses is under threshold
-        next if $nol < $self->{num_of_lic_threshold};
+        next if $nol < $self->{min_licenses};
 
         push @results, [ $token_id, $nol, $non, $nou, $licenses ];
     }
