@@ -5,9 +5,8 @@ use Digest::MD5 qw(md5_hex);
 
 # use Digest::SHA1 qw(sha1 sha1_hex);
 use LIFinder::Tokenizor::CCFinderX;
+use LIFinder::Tokenizor::TXL;
 use File::Spec::Functions 'catfile';
-
-my $ccfx_default_cmd = 'ccfx';
 
 sub new {
     my ( $class, $args ) = @_;
@@ -75,8 +74,7 @@ sub execute {
           if ( substr( $ext, 0, 1 ) eq '.' );
         $normalized_ext = lc $normalized_ext;
 
-        LIFinder::Tokenizor::CCFinderX::get_token_hash( \@file_list,
-            $normalized_ext, \&_digester );
+        tokenize( \@file_list, $normalized_ext );
 
         foreach my $file_item_ref (@file_list) {
             my %item = %{$file_item_ref};
@@ -88,6 +86,19 @@ sub execute {
     }
 
     $dbm->commit();
+}
+
+sub tokenize {
+    my ( $file_list_ref, $ext ) = @_;
+
+    if ( $ext eq 'js' ) {
+        LIFinder::Tokenizor::TXL::get_token_hash( $file_list_ref, $ext,
+            \&_digester );
+    }
+    else {
+        LIFinder::Tokenizor::CCFinderX::get_token_hash( $file_list_ref, $ext,
+            \&_digester );
+    }
 }
 
 sub _digester {

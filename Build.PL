@@ -29,4 +29,7 @@ my $builder = Module::Build->new(
     create_makefile_pl => 'traditional',
 );
 
+$builder->add_build_element('txl');
+$builder->add_build_element('grm');
+
 $builder->create_build_script();

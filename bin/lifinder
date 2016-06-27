@@ -51,7 +51,7 @@ Options:
       -s 8: only make reports
       -s 2+4+8: skip file listing step
       -s 14: same as above
-   -m <num>: only report groups that contain more than <num> licenses, default 2
+  -m <num>: only report groups that contain more than <num> licenses, default 2
 
 END
 

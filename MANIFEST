@@ -8,6 +8,10 @@ lib/LIFinder/LicenseIndentifier.pm
 lib/LIFinder/ReportMaker.pm
 lib/LIFinder/TokenHash.pm
 lib/LIFinder/Tokenizor/CCFinderX.pm
+lib/LIFinder/Tokenizor/TXL.pm
+lib/LIFinder/Tokenizor/Txl/bom.grm
+lib/LIFinder/Tokenizor/Txl/js.grm
+lib/LIFinder/Tokenizor/Txl/js.txl
 MANIFEST			This list of files
 README
 t/00-load.t
